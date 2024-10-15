@@ -9,6 +9,9 @@ import base64
 import re
 import time
 
+USERFILE='userfile'
+KEYSFILE='keys'
+
 def main():
     try:
         clear_term()
@@ -42,7 +45,7 @@ def inspect_keys():
     # search for file that contains keys ("keys.js")
     # if not found, no keys. If found display keys
     if keysFileExists():
-        with open("keys.json","rb") as file:
+        with open(KEYSFILE,"rb") as file:
             decrypted = fernet_obj.decrypt(file.read())
             json_string = decrypted.decode('utf-8')
             json_obj = json.loads(json_string)
@@ -74,13 +77,13 @@ def create_keys():
                     input("presiona una tecla para internarlo de nuevo")
                     continue
                 else:
-                    with open("keys.json","rb") as file:
+                    with open(KEYSFILE,"rb") as file:
                         decrypted = fernet_obj.decrypt(file.read())
                         json_string = decrypted.decode('utf-8')
                         file_json = json.loads(json_string)
                         # add new key with title as key and key as value in variable
                         file_json[title] = key
-                    with open("keys.json","wb") as file:
+                    with open(KEYSFILE,"wb") as file:
                         json_string = json.dumps(file_json)
                         encrypted = fernet_obj.encrypt(json_string.encode('utf-8'))
                         file.write(encrypted)
@@ -89,7 +92,7 @@ def create_keys():
             input("presiona una tecla para regresar...")
         return
     else:
-        # keys.json doesnt exist
+        # 'keys' doesnt exist
         print("Agregando una clave por primera vez...")
         print("Introduce el titulo de la clave")
         title = input()
@@ -106,13 +109,13 @@ def create_keys():
                 input("presiona una tecla para intentarlo de nuevo")
                 continue
             else:
-                with open("keys.json","xb") as file:
+                with open(KEYSFILE,"xb") as file:
                     file_json = {title:key}
                     # encrypt data, then fill file with it
                     encrypted = fernet_obj.encrypt(json.dumps(file_json).encode("utf-8"))
                     file.write(encrypted)
                 break
-        print("se ha creado el archivo 'keys.json'")
+        print("se ha creado el archivo 'keys'")
         print("clave guardada con exito")
         input("presiona una tecla para regresar...")
     return
@@ -141,12 +144,12 @@ def delete_keys():
                 return
             elif confirm=="si":
                 title = title.lower()
-                with open("keys.json","rb") as file:
+                with open(KEYSFILE,"rb") as file:
                     decrypted = fernet_obj.decrypt(file.read())
                     json_string = decrypted.decode('utf-8')
                     file_json = json.loads(json_string)
                 file_json.pop(title)
-                with open("keys.json","wb") as file:
+                with open(KEYSFILE,"wb") as file:
                     json_string = json.dumps(file_json)
                     encrypted = fernet_obj.encrypt(json_string.encode('utf-8'))
                     file.write(encrypted)
@@ -164,12 +167,12 @@ def delete_keys():
 def keysFileExists():
     files = os.listdir()
     for file in files:
-        if file=="keys.json":
+        if file==KEYSFILE:
             return True
     return False
 
 def titleExists(title):
-    with open("keys.json","rb") as file:
+    with open(KEYSFILE,"rb") as file:
         decrypted = fernet_obj.decrypt(file.read())
         json_string = decrypted.decode('utf-8')
         file_json = json.loads(json_string)
@@ -188,7 +191,7 @@ def authenticate_user():
     if userFileExists():
         print("introduce tu clave para ingresar")
         password = input("->")
-        with open('userfile','rb') as file:
+        with open(USERFILE,'rb') as file:
             hash_obj = hashlib.sha256()
             hash_obj.update(password.encode('utf-8'))
             if file.read(32)==hash_obj.digest():
@@ -211,7 +214,7 @@ def authenticate_user():
                 continue
             
             # create userfile that contains hashed pass, and encrypt it using it
-            with open("userfile","wb") as file:
+            with open(USERFILE,"wb") as file:
                 hash_obj = hashlib.sha256()
                 hash_obj.update(password.encode('utf-8'))
                 file.write(hash_obj.digest())
@@ -226,7 +229,7 @@ def authenticate_user():
 def userFileExists():
     files = os.listdir()
     for file in files:
-        if file=="userfile":
+        if file==USERFILE:
             return True
     return False
 
@@ -285,11 +288,11 @@ def passwordCreation():
 def checkToken():
     if keysFileExists():
         try:
-            with open("keys.json","rb") as file:
+            with open(KEYSFILE,"rb") as file:
                 decrypted = fernet_obj.decrypt(file.read())
         except (InvalidToken, InvalidSignature):
-            print("ERROR: El archivo de llaves no corresponde a la cuenta.\nlas llaves en el archivo 'keys.json' no pudieron ser leidas por las credenciales de 'userfile'")
-            print("\nQuita el archivo 'keys.json' para generar uno nuevo, o utiliza el archivo 'userfile' correcto")
+            print("ERROR: El archivo de llaves no corresponde a la cuenta.\nlas llaves en el archivo 'keys' no pudieron ser leidas por las credenciales de 'userfile'")
+            print("\nQuita el archivo 'keys' para generar uno nuevo, o utiliza el archivo 'userfile' correcto")
             input("presiona una tecla para salir")
             sys.exit()
 
