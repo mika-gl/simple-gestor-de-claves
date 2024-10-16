@@ -3,7 +3,7 @@ Gestor simple de claves escrito en Python.
 Uso mediante CLI. Opciones para Inspeccionar, Crear y Eliminar claves del usuario.  
 
 Utiliza el módulo Fernet para la encriptación simétrica con AES de las llaves almacenadas:  
-Segun la [documentación](https://cryptography.io/en/latest/fernet/):  
+Según la [documentación](https://cryptography.io/en/latest/fernet/):  
 > AES in CBC mode with a 128-bit key for encryption; using PKCS7 padding  
 > HMAC using SHA256 for authentication  
 > Initialization vectors are generated using os.urandom()  
