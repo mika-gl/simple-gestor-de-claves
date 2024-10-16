@@ -213,8 +213,8 @@ def authenticate_user():
                 input("presiona una tecla para intentarlo de nuevo")
                 continue
             
-            # create userfile that contains hashed pass, and encrypt it using it
-            with open(USERFILE,"wb") as file:
+            # create userfile that contains hashed pass
+            with open(USERFILE,"xb") as file:
                 hash_obj = hashlib.sha256()
                 hash_obj.update(password.encode('utf-8'))
                 file.write(hash_obj.digest())
@@ -223,7 +223,7 @@ def authenticate_user():
             break
     print("cuenta registrada con exito")
     input("presiona una tecla para ir al inicio")
-    return False
+    return True 
 
 
 def userFileExists():
