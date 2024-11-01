@@ -187,22 +187,26 @@ def clear_term():
     else:
         os.system('clear')
 
+def validate_password(password):
+    with open(USERFILE,'rb') as file:
+        hash_obj = hashlib.sha256()
+        hash_obj.update(password.encode('utf-8'))
+        if file.read(32)==hash_obj.digest():
+            salt = file.read()
+            global fernet_obj
+            fernet_obj = generate_fernet_obj(password, salt)
+            return True
+        else:
+            if __name__ == "__main__":
+                print("la clave no es correcta")
+                input("presiona una tecla para regresar")
+            return False
+
 def authenticate_user():
     if userFileExists():
         print("introduce tu clave para ingresar")
         password = input("->")
-        with open(USERFILE,'rb') as file:
-            hash_obj = hashlib.sha256()
-            hash_obj.update(password.encode('utf-8'))
-            if file.read(32)==hash_obj.digest():
-                salt = file.read()
-                global fernet_obj
-                fernet_obj = generate_fernet_obj(password, salt)
-                return True
-            else:
-                print("la clave no es correcta")
-                input("presiona una tecla para regresar")
-                return False
+        return validate_password(password)
     else:
         while True:
             password = passwordCreation()
@@ -219,7 +223,9 @@ def authenticate_user():
                 hash_obj.update(password.encode('utf-8'))
                 file.write(hash_obj.digest())
                 file.write(os.urandom(16)) # salt for fernet
-
+				
+            # call "validate" so fernet object is created for newly created account
+            validate_password(password)
             break
     print("cuenta registrada con exito")
     input("presiona una tecla para ir al inicio")
@@ -296,4 +302,6 @@ def checkToken():
             input("presiona una tecla para salir")
             sys.exit()
 
-main()
+if __name__ == "__main__":
+    main()
+
